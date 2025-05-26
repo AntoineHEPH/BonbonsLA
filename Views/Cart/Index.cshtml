@@ -1,0 +1,46 @@
+@model CartIndexViewModel
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Mon Panier";
+    decimal total = Model.Products.Sum(item => item.Product.Prix * item.Quantity);
+}
+
+<h2>Mon Panier</h2>
+
+@if (!Model.Products.Any())
+{
+    <p>Votre panier est vide.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Produit</th>
+            <th>Prix unitaire</th>
+            <th>Quantité</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @{ decimal qtxPrix = 0;}
+        @foreach (var item in Model.Products)
+        {
+            qtxPrix = item.Product.Prix * item.Quantity;
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Product.Prix.ToString("C0")</td>
+                <td>@item.Quantity</td>
+                <td>@qtxPrix.ToString("C0") €</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td><strong>@total.ToString("C0") €</strong></td>
+        </tr>
+        </tfoot>
+    </table>
+}

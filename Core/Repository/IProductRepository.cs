@@ -10,6 +10,7 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Core.Repository
         public Task<int> Insert(Product product);
         public Task<int> Update(int id, Product product);
 
-        Task<bool> Exists(string? name);
+        public Task<bool> Exists(string? name);
+        public Task<int> DisableAsync(int id);
     }
 }

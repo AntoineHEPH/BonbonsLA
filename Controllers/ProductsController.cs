@@ -11,11 +11,25 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Controllers
     {
 
         private readonly IProductRepository _productRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ICartRepository _cartRepository;
 
-        public ProductsController(IProductRepository productRepository)
+        public ProductsController(IProductRepository productRepository, IUserRepository userRepository, ICartRepository cartRepository)
         {
             _productRepository = productRepository;
+            _userRepository = userRepository;
+            _cartRepository = cartRepository;
         }
+        
+        private Task<User?> GetCurrentUser()
+        {
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return null;
+
+            return _userRepository.GetByUsernameAsync(username);
+        }
+        
 
         // GET: ProjectsController
         public async Task<ActionResult> Index()
@@ -46,7 +60,8 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Controllers
                 Name = model.Name,
                 Description = model.Description,
                 Type = (int)model.Type,
-                Prix = model.Prix
+                Prix = model.Prix,
+                IsActive = true
             });
             return RedirectToAction(nameof(Index));
         }
@@ -82,6 +97,53 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Controllers
             });
             return RedirectToAction(nameof(Index));
         }
+        
+        [Authorize(Policy = "AdminUserAccess")]
+        public async Task<IActionResult> AddToCart(int productId)
+        {
+            var user = await GetCurrentUser();
+            if (user == null)
+                return RedirectToAction("Login", "Account");
+
+            await _cartRepository.Add(user.Id, productId, 1);
+            return RedirectToAction(nameof(Index));
+        }
+
+        
+        
+        
+        public async Task<IActionResult> Cart()
+        {
+            var user = await GetCurrentUser();
+
+            if (user == null || user.Cart == null)
+            {
+                return View(new List<ProductInCart>()); // panier vide
+            }
+
+            return View(user.Cart.ProductsList);
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Disable(int id)
+        {
+            var rowsAffected = await _productRepository.DisableAsync(id);
+            if (rowsAffected > 0)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return NotFound();
+        }
+
+
+        
+        
+
+
+
+        
+        
 
     }
 }

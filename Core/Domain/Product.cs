@@ -8,5 +8,6 @@ public class Product
     public required string? Description { get; set; }
     public required int Type { get; set; }
     public decimal Prix { get; set; }
+    public bool IsActive { get; set; }
 
 }

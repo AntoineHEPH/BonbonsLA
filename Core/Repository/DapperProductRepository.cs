@@ -18,7 +18,7 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Core.Repository
             using var connection = await _dbConnectionProvider.CreateConnection();
             var result =
                 await connection.QueryAsync<Product>(
-                    "SELECT id, name, description, type, prix FROM products ORDER BY id");
+                    "SELECT id, name, description, type, prix, isactive FROM products WHERE isactive = true ORDER BY id");
             return result.ToList();
         }
 
@@ -76,6 +76,16 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Core.Repository
             return await connection.ExecuteScalarAsync<bool>("""
                                                              SELECT EXISTS (SELECT 1 FROM products WHERE name = @name)
                                                              """, new {name});
+        }
+
+        public async Task<int> DisableAsync(int id)
+        {
+            using var connection = await _dbConnectionProvider.CreateConnection();
+            return await connection.ExecuteAsync("""
+                                                 UPDATE Products
+                                                 SET IsActive = FALSE
+                                                 WHERE id = @id;
+                                                 """, new { Id = id });
         }
     }
 }

@@ -13,6 +13,8 @@ builder.Services.AddScoped<IProductRepository, DapperProductRepository>();
 builder.Services.AddScoped<IDbConnectionProvider, PGSqlDbConnectionProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserRepository, DapperUserRepository>();
+builder.Services.AddScoped<IProductRepository, DapperProductRepository>();
+builder.Services.AddScoped<ICartRepository, DapperCartRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Configuration de l'authentification par cookies
@@ -27,6 +29,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CreateProductPolicy", 
+        policy => policy.RequireRole("Admin", "User"));
+    
+    options.AddPolicy("AdminUserAccess", 
         policy => policy.RequireRole("Admin", "User"));
 });
 

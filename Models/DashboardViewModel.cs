@@ -33,14 +33,8 @@ namespace Condorcet.B2.AspnetCore.MVC.Application.Models
 
     public class RecentUserDto
     {
-        /// <summary>
-        /// Nom d'utilisateur
-        /// </summary>
-        public string Username { get; set; }
 
-        /// <summary>
-        /// Date de création du compte
-        /// </summary>
+        public string Username { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
